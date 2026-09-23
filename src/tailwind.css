@@ -61,6 +61,12 @@
   @apply max-w-[1580px];
 }
 
+/* User-approved layout: keep content 24px from the sidebar on desktop.
+   Do not centre or constrain these pages without an explicit user request. */
+@utility pinned-workspace-page {
+  @apply m-0 min-w-0 w-full max-w-none px-3 pb-14 pt-8 md:px-6;
+}
+
 @utility panel {
   @apply rounded-panel border border-line bg-white p-5 shadow-panel;
 }

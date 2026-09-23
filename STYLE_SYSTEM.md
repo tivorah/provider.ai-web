@@ -1,5 +1,14 @@
 # Provider.ai styling standard
 
+## Fixed user-approved workspace layout
+
+Dashboard (“Your day, at a glance.”), Roster and Participants must use
+`pinned-workspace-page`: full available content width, no centred container,
+24px horizontal padding on desktop and 12px on mobile. Headings, summary
+cards and tables share the same left edge, 24px from the sidebar on desktop.
+Apply this to loading and error states too. The user explicitly requires
+this layout to remain unchanged; do not alter it without a new explicit request.
+
 Provider.ai uses Tailwind CSS v4 for all ordinary interface styling.
 
 Use Tailwind utilities for:
