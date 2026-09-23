@@ -56,7 +56,7 @@ const dashboard: DashboardData = {
 export const mockApi = {
   async me() { const state = read(); return state.session ? delay(state.principal, 250) : fail("No mock session"); },
   async register(input: { organisationName: string; firstName: string; lastName: string; email: string; password: string }) { const state = initialState(); state.session = true; state.password = input.password; state.principal = { ...demoPrincipal, email: input.email, firstName: input.firstName, lastName: input.lastName, organisation: { ...demoPrincipal.organisation, name: input.organisationName } }; write(state); return delay(state.principal); },
-  async login(input: { email: string; password: string }) { const state = read(); if (input.email.toLowerCase() !== state.principal.email.toLowerCase() || input.password !== state.password) return fail(`Use ${DEMO_CREDENTIALS.email} and ${DEMO_CREDENTIALS.password}`); state.session = true; write(state); return delay(state.principal); },
+  async login(input: { email: string; password: string }) { const isDemoLogin = input.email.toLowerCase() === DEMO_CREDENTIALS.email && input.password === DEMO_CREDENTIALS.password; const state = isDemoLogin ? initialState() : read(); if (!isDemoLogin && (input.email.toLowerCase() !== state.principal.email.toLowerCase() || input.password !== state.password)) return fail(`Use ${DEMO_CREDENTIALS.email} and ${DEMO_CREDENTIALS.password}`); state.session = true; write(state); return delay(state.principal); },
   async logout() { const state = read(); state.session = false; write(state); return delay(undefined); },
   async dashboard() { const state = read(); return delay({ ...dashboard, greeting: `Good morning, ${state.principal.firstName}` }); },
   async jobs() { return delay(read().jobs); },
