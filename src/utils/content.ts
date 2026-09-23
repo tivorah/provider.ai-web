@@ -40,8 +40,8 @@ export const primaryNavigation: NavigationGroup[] = [
     { id: "recruitment", label: "Recruitment", icon: BriefcaseBusiness },
   ] },
   { label: "Operations", items: [
-    { id: "finance", label: "Finance", icon: CircleDollarSign },
-    { id: "compliance", label: "Quality", icon: ShieldCheck },
+    { id: "finance", label: "Accounting & payroll", icon: CircleDollarSign },
+    { id: "compliance", label: "Compliance", icon: ShieldCheck },
     { id: "reports", label: "Reports", icon: ChartNoAxesCombined },
   ] },
   { label: "Administration", items: [

@@ -41,7 +41,6 @@ import { RosterPage } from "./pages/Roster";
 import { ParticipantDirectory } from "./pages/ParticipantDirectory";
 import { AccessManagement } from "./pages/AccessManagement";
 import { InboxPage } from "./pages/UnifiedInbox";
-import { ProviderIntelligence } from "./pages/ProviderIntelligence";
 import { PerformanceGoals } from "./pages/PerformanceGoals";
 import { ProviderHome } from "./pages/ProviderHome";
 import { PublicPage, type PublicPageId } from "./pages/PublicPage";
@@ -51,6 +50,8 @@ import { api, isMockMode } from "./api";
 import type { Page } from "./types";
 import { primaryNavigation } from "./utils/content";
 import { canAccessPage } from "./config/product";
+import { ContextAssistant } from "./features/operations/ContextAssistant";
+import { snapshot as operationsSnapshot } from "./features/operations/store";
 
 export function App() {
   const queryClient = useQueryClient();
@@ -68,7 +69,6 @@ export function App() {
   );
   const [commandOpen, setCommandOpen] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(() => new URLSearchParams(window.location.search).get("assistant") === "full");
-  const [assistantMode, setAssistantMode] = useState<"drawer" | "full">(() => new URLSearchParams(window.location.search).get("assistant") === "full" ? "full" : "drawer");
   const [rosterCreateRequest, setRosterCreateRequest] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [notice, setNotice] = useState("");
@@ -141,7 +141,7 @@ export function App() {
     };
     const announce = (event: Event) =>
       setNotice((event as CustomEvent<string>).detail);
-    const assistant = () => { setAssistantMode("drawer"); setAssistantOpen(true); };
+    const assistant = () => setAssistantOpen(true);
     window.addEventListener("provider-navigate", navigate);
     window.addEventListener("provider-notice", announce);
     window.addEventListener("provider-assistant", assistant);
@@ -456,7 +456,9 @@ export function App() {
               aria-label="Notifications"
               onClick={() =>
                 setNotice(
-                  "You’re all caught up. No new critical notifications.",
+                  isMockMode && canAccessPage(principal.role, "compliance")
+                    ? `${operationsSnapshot().tasks.filter(task => task.status !== "Complete").length} demo compliance actions need review. Open Compliance for owners, dates and evidence. Live regulatory monitoring is not connected.`
+                    : "Live regulatory notifications are not connected. Open the assistant for official guidance relevant to this section.",
                 )
               }
             >
@@ -478,13 +480,7 @@ export function App() {
         />
       )}
       {assistantOpen && (
-        <ProviderIntelligence
-          onClose={() => setAssistantOpen(false)}
-          onNavigate={selectPage}
-          mode={assistantMode}
-          onToggleMode={() => setAssistantMode((value) => value === "drawer" ? "full" : "drawer")}
-          onOpenNewTab={() => window.open(`${window.location.origin}${window.location.pathname}?assistant=full`, "_blank", "noopener,noreferrer")}
-        />
+        <ContextAssistant section={page.value} onClose={() => setAssistantOpen(false)} />
       )}
       {notice && (
         <div className="action-toast" role="status">
