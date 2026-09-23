@@ -62,7 +62,7 @@ export function App() {
   });
   const page = useHookstate<Page>("dashboard");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<"register" | "login">("register");
+  const [authMode, setAuthMode] = useState<"register" | "login">("login");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => localStorage.getItem("provider-ai-sidebar-collapsed") === "true",
   );
