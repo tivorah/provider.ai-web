@@ -21,7 +21,7 @@ export function Dashboard() {
   const role = session.data?.role;
   const allowed = (page: Page) => canAccessPage(role, page);
   if (isLoading) return <DashboardSkeleton />;
-  if (error || !data) return <section className="page"><div role="alert" className="grid min-h-[360px] place-content-center justify-items-center rounded-xl border border-line bg-white p-8 text-center"><AlertCircle className="size-8 text-danger" /><h1 className="mt-5">Your overview is unavailable</h1><p className="mt-3 text-sm text-muted">We couldn’t load your workspace. Please try again.</p><button className="primary-button mt-6" disabled={isFetching} onClick={() => refetch()}><RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`} />Try again</button></div></section>;
+  if (error || !data) return <section className="page m-0 max-w-none"><div role="alert" className="grid min-h-[360px] place-content-center justify-items-center rounded-xl border border-line bg-white p-8 text-center"><AlertCircle className="size-8 text-danger" /><h1 className="mt-5">Your overview is unavailable</h1><p className="mt-3 text-sm text-muted">We couldn’t load your workspace. Please try again.</p><button className="primary-button mt-6" disabled={isFetching} onClick={() => refetch()}><RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`} />Try again</button></div></section>;
   const metrics = data.widgets.filter(widget => metricDefinitions[widget.id] && allowed(metricDefinitions[widget.id].page)).slice(0, 4);
   const attention = data.attention.filter(item => { const page = attentionPage(item.kind); return page && allowed(page); });
   const canCreateShift = ["owner", "administrator", "roster_coordinator"].includes(role ?? "");
@@ -33,7 +33,7 @@ export function Dashboard() {
     { page: "reports" as Page, icon: ArrowUpRight, title: "Reports & evidence", copy: "Operational exports & audit history" },
   ].filter(item => allowed(item.page));
 
-  return <section className="page space-y-8">
+  return <section className="page m-0 max-w-none space-y-8">
     <PageHeader category={today} title="Your day, at a glance." description={`Welcome back, ${session.data?.firstName ?? 'there'}. Here’s what needs your attention.`}>
       <div className="flex items-center gap-3"><button onClick={() => refetch()} disabled={isFetching} aria-label="Refresh overview" className="grid size-11 place-items-center rounded-full border border-line bg-white hover:bg-canvas disabled:opacity-50"><RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`} /></button>{canCreateShift ? <button onClick={() => window.dispatchEvent(new CustomEvent("provider-navigate", { detail: { page: "roster", action: "create-shift" } }))} className="primary-button min-h-11"><CalendarDays size={16} /> Create shift</button> : allowed("roster") ? <button onClick={() => navigate("roster")} className="primary-button min-h-11">View roster <ArrowRight size={16} /></button> : null}</div>
     </PageHeader>

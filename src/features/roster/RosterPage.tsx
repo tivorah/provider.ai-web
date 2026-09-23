@@ -406,7 +406,7 @@ export function RosterPage({ createRequest = 0 }: { createRequest?: number }) {
     scrollArea.scrollTop = Math.max(0, (earliestStart - leadInHours) * 56);
   }, [view, selectedDay, weekOffset]);
   return (
-    <section className="page roster-page text-sm leading-normal">
+    <section className="page m-0 max-w-none roster-page text-sm leading-normal">
       <PageHeader category="Care delivery" title="Roster" description="Plan services, assign workers and review coverage across your team."><button className="primary-button min-h-11" onClick={() => openCreate()}><Plus className="size-4" />Create shift</button></PageHeader>
       <div className="roster-command [display:flex] [align-items:center] [gap:15px] [margin-bottom:12px] max-[760px]:[align-items:flex-start] max-[760px]:[flex-wrap:wrap]">
         <div className="date-control [display:flex] [align-items:center] [gap:7px] [&_button]:[width:28px] [&_button]:[height:28px] [&_button]:[border:1px_solid_var(--border)] [&_button]:[border-radius:8px] [&_button]:[background:white] [&_strong]:[font:700_11px_var(--font-sans)] [&_strong]:[min-width:120px] [&_strong]:[text-align:center] [&_.today-button]:[width:auto] [&_.today-button]:[padding:0_9px] [&_.today-button]:[font-size:11px] [&_.today-button]:[font-size:11px] [&_.today-button]:[font-size:13px] [&_strong]:[font-size:13px]">

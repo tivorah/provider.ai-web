@@ -3,7 +3,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   ArrowRight,
-  Check,
+  CalendarDays,
+  UsersRound,
+  ClipboardCheck,
   LoaderCircle,
   Mail,
   Eye,
@@ -107,22 +109,32 @@ export function Auth({ onBack, initialMode = "login" }: { onBack?: () => void; i
         <div className="pointer-events-none absolute -right-44 -top-48 size-[600px] rounded-full border border-brand-200" aria-hidden="true" />
         <div className="pointer-events-none absolute -right-28 -top-32 size-[470px] rounded-full border border-brand-200" aria-hidden="true" />
         <div className="relative">
-          <p className="text-xs font-medium uppercase tracking-[.16em] text-brand-800">The care behind your care</p>
-          <h2 className="mt-10 max-w-[490px] text-[clamp(38px,3.8vw,58px)] font-medium leading-[1.08] tracking-[-.055em] text-ink">Less to juggle.<br />More room for<br /><span className="text-brand-700">what matters.</span></h2>
-          <p className="mt-6 max-w-[360px] text-sm leading-7 text-brand-800">One clear view of your people, your operations and the care you make possible.</p>
+          <p className="text-xs font-medium uppercase tracking-[.16em] text-brand-800">A clearer day starts here</p>
+          <h2 className="mt-10 max-w-[490px] text-[clamp(38px,3.8vw,58px)] font-medium leading-[1.08] tracking-[-.055em] text-ink">Behind every<br />great day of care,<br /><span className="text-brand-700">a connected team.</span></h2>
+          <p className="mt-6 max-w-[390px] text-sm leading-7 text-brand-800">Know who needs you, see what’s next and give your team the context to move forward.</p>
         </div>
 
-        <figure className="relative my-10">
-          <div className="overflow-hidden rounded-2xl border border-white bg-white p-2 shadow-float">
-            <div className="flex items-center gap-1.5 px-2 pb-2 pt-1" aria-hidden="true"><span className="size-1.5 rounded-full bg-line" /><span className="size-1.5 rounded-full bg-line" /><span className="size-1.5 rounded-full bg-line" /><span className="ml-3 text-[11px] text-muted">Your Provider.ai workspace</span></div>
-            <img src="/product/workspace.png" alt="Provider.ai dashboard showing a daily overview of care operations" className="w-full rounded-lg border border-line" />
+        <div className="relative my-10 rounded-2xl border border-white bg-white p-6 shadow-float xl:p-8">
+          <div className="flex items-center justify-between gap-3 border-b border-line pb-5">
+            <div><p className="text-xs text-muted">Your day, connected</p><h3 className="mt-1.5 text-lg font-medium tracking-tight">The little things. All together.</h3></div>
+            <span className="rounded-full bg-canvas px-2.5 py-1 text-[11px] text-muted">Preview</span>
           </div>
-          <figcaption className="mt-3 text-center text-xs text-brand-800">A little clarity for every day. · Demo workspace</figcaption>
-        </figure>
+          <div className="relative mt-6 grid gap-6">
+            <div className="absolute bottom-6 left-5 top-5 w-px bg-line" aria-hidden="true" />
+            {[
+              { icon: CalendarDays, time: "Start with a plan", title: "The right people, in the right place", detail: "See upcoming shifts and where coverage needs a hand." },
+              { icon: UsersRound, time: "Keep care personal", title: "A person behind every plan", detail: "Keep support needs and participant context close by." },
+              { icon: ClipboardCheck, time: "Finish with clarity", title: "Know what needs your attention", detail: "Bring team readiness and everyday follow-ups into view." },
+            ].map(({ icon: Icon, time, title, detail }) => <div key={time} className="relative flex items-start gap-4">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-brand-100 bg-brand-50 text-brand-800"><Icon size={18} strokeWidth={1.5} /></span>
+              <div className="pt-0.5"><p className="text-[11px] font-medium text-brand-700">{time}</p><h4 className="mt-1 text-sm font-medium text-ink">{title}</h4><p className="mt-1.5 max-w-[310px] text-xs leading-5 text-muted">{detail}</p></div>
+            </div>)}
+          </div>
+        </div>
 
         <div className="relative border-t border-brand-200 pt-6">
-          <p className="mb-4 text-sm font-medium text-ink">Built for the way NDIS providers work.</p>
-          <div className="flex flex-wrap gap-x-5 gap-y-3">{["People & plans", "Teams & rosters", "Everyday operations"].map(item => <span key={item} className="inline-flex items-center gap-1.5 text-xs text-brand-800"><Check size={14} />{item}</span>)}</div>
+          <p className="text-sm font-medium text-ink">More clarity for your team. More time for care.</p>
+          <p className="mt-2 text-xs leading-6 text-brand-800">Thoughtfully built for Australian NDIS providers.</p>
         </div>
       </aside>
     </main>

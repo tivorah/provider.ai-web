@@ -56,7 +56,7 @@ export function ParticipantDirectory() {
     return matchesQuery && matchesStatus && matchesRegion;
   });
   return (
-    <section className="page participant-directory text-sm leading-normal">
+    <section className="page m-0 max-w-none participant-directory text-sm leading-normal">
       <PageHeader category="Care delivery" title="Participants" description="Manage participant records, plans, agreements and support needs."><button onClick={() => setDrawerOpen(true)} className="primary-button min-h-11"><Plus className="size-4" />Add participant</button></PageHeader>
       <div className="summary-grid">
         <SummaryStat icon={<UsersRound />} value="38" label="Active participants" detail="Current service records" />
