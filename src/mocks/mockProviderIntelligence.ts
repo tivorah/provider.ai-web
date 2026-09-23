@@ -1,0 +1,22 @@
+import type { Page } from "../types";
+
+export type IntelligenceIcon="roster"|"people"|"finance"|"document"|"compliance";
+export type MockInsightCard={title:string;value:string;detail:string;tone:string;icon:IntelligenceIcon;page:Page};
+export type MockIntelligenceAnswer={text:string;cards?:MockInsightCard[];followUps?:string[]};
+
+export const intelligenceSuggestions=["What needs my attention today?","Who can cover Tuesday’s open shift?","Which credentials expire soon?","Summarise our financial position","Are we audit ready?","Show participant plan risks"];
+export const intelligenceStarterCards:MockInsightCard[]=[
+  {title:"Open shifts",value:"4",detail:"One needs coverage within 24 hours",tone:"amber",icon:"roster",page:"roster"},
+  {title:"Credentials",value:"5",detail:"Expiring in the next 30 days",tone:"rose",icon:"compliance",page:"people"},
+  {title:"Claims ready",value:"$18,420",detail:"12 claims ready for review",tone:"mint",icon:"finance",page:"finance"}
+];
+
+export function getMockIntelligenceAnswer(question:string):MockIntelligenceAnswer{
+  const value=question.toLowerCase();
+  if(value.includes("shift")||value.includes("cover")||value.includes("roster"))return {text:"Tuesday’s 9:00 am support for Lucas is still open. Ava is unavailable, while Jack and Amelia meet the current availability and credential rules. Amelia provides the stronger continuity match, but assigning her would reduce Friday capacity.",cards:[{title:"Recommended worker",value:"Amelia Taylor",detail:"92% match · available · credentials current",tone:"violet",icon:"people",page:"roster"},{title:"Shift",value:"Tue 09:00",detail:"Lucas Brown · social participation",tone:"amber",icon:"roster",page:"roster"}],followUps:["Why is Amelia the best match?","Show all open shifts","Check overtime risk"]};
+  if(value.includes("credential")||value.includes("worker screening"))return {text:"Five workforce credentials expire in the next 30 days. Liam has two items requiring attention, including a worker-screening renewal. He should not be assigned beyond the evidence expiry date unless the renewal is verified.",cards:[{title:"Highest priority",value:"Liam Smith",detail:"2 credentials expiring",tone:"rose",icon:"compliance",page:"people"}],followUps:["Show every expiring credential","Draft renewal reminders","Who is blocked from rostering?"]};
+  if(value.includes("financial")||value.includes("claim")||value.includes("invoice")||value.includes("revenue"))return {text:"August revenue is $184,260 with a projected gross margin of 34.8%. Twelve claims worth $18,420 are ready. One $2,960 claim for Isla is in exception and is the clearest immediate revenue-recovery action.",cards:[{title:"Ready to claim",value:"$18,420",detail:"12 approved claims",tone:"mint",icon:"finance",page:"finance"},{title:"Claim exception",value:"$2,960",detail:"Isla Wilson · review support evidence",tone:"rose",icon:"document",page:"finance"}],followUps:["Explain the claim exception","Show overdue invoices","Compare labour cost to revenue"]};
+  if(value.includes("audit")||value.includes("compliance"))return {text:"Audit readiness is currently 94%. No critical deadline is overdue. The main gaps are participant risk-assessment review, Liam’s screening renewal and an incident corrective action due on 11 August.",cards:[{title:"Audit readiness",value:"94%",detail:"12 open actions · none critical",tone:"mint",icon:"compliance",page:"compliance"}],followUps:["List priority actions","Show missing evidence","Prepare an audit briefing"]};
+  if(value.includes("participant")||value.includes("plan"))return {text:"Four participant plans need review. Isla has the highest utilisation at 78% with renewal approaching on 9 September. Her upcoming services and remaining budget should be reviewed before confirming the next monthly roster.",cards:[{title:"Plan risk",value:"Isla Wilson",detail:"78% utilised · renews 9 September",tone:"amber",icon:"people",page:"participants"}],followUps:["Show all plan utilisation","Explain Isla’s spending trend","Draft a plan review note"]};
+  return {text:"Today’s priority is safe service coverage. One open Tuesday shift needs a worker, five credentials are approaching expiry, and twelve claims are ready for submission. No critical compliance deadline is overdue.",cards:intelligenceStarterCards,followUps:["Start with the open shift","Review credential risks","Open ready claims"]};
+}

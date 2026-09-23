@@ -1,0 +1,49 @@
+import { PageHeader } from "../components/PageHeader";
+import { useQuery } from "@tanstack/react-query";
+import { AlertCircle, ArrowRight, ArrowUpRight, CalendarDays, Check, ChevronRight, CircleDollarSign, RefreshCw, ShieldCheck, UsersRound } from "lucide-react";
+import { api, isMockMode } from "../api";
+import { canAccessPage } from "../config/product";
+import type { Page } from "../types";
+import { DashboardSkeleton } from "../features/dashboard";
+
+const navigate = (detail: Page) => window.dispatchEvent(new CustomEvent("provider-navigate", { detail }));
+const metricDefinitions: Record<string, { page: Page; icon: typeof CalendarDays }> = {
+  "today-shifts": { page: "roster", icon: CalendarDays },
+  "team-ready": { page: "people", icon: UsersRound },
+  claims: { page: "finance", icon: CircleDollarSign },
+  incidents: { page: "compliance", icon: ShieldCheck },
+};
+const attentionPage = (kind: string): Page | undefined => ({ credential: "compliance", roster: "roster", claim: "finance", invoice: "finance", incident: "compliance" })[kind] as Page | undefined;
+
+export function Dashboard() {
+  const session = useQuery({ queryKey: ["me"], queryFn: api.me, staleTime: 60_000 });
+  const { data, isLoading, error, refetch, isFetching, dataUpdatedAt } = useQuery({ queryKey: ["dashboard"], queryFn: api.dashboard });
+  const role = session.data?.role;
+  const allowed = (page: Page) => canAccessPage(role, page);
+  if (isLoading) return <DashboardSkeleton />;
+  if (error || !data) return <section className="page"><div role="alert" className="grid min-h-[360px] place-content-center justify-items-center rounded-xl border border-line bg-white p-8 text-center"><AlertCircle className="size-8 text-danger" /><h1 className="mt-5">Your overview is unavailable</h1><p className="mt-3 text-sm text-muted">We couldn’t load your workspace. Please try again.</p><button className="primary-button mt-6" disabled={isFetching} onClick={() => refetch()}><RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`} />Try again</button></div></section>;
+  const metrics = data.widgets.filter(widget => metricDefinitions[widget.id] && allowed(metricDefinitions[widget.id].page)).slice(0, 4);
+  const attention = data.attention.filter(item => { const page = attentionPage(item.kind); return page && allowed(page); });
+  const canCreateShift = ["owner", "administrator", "roster_coordinator"].includes(role ?? "");
+  const today = new Intl.DateTimeFormat("en-AU", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
+  const shortcuts = [
+    { page: "participants" as Page, icon: UsersRound, title: "Participant records", copy: "Plans, agreements & support needs" },
+    { page: "people" as Page, icon: ShieldCheck, title: "Workforce readiness", copy: "People, credentials & availability" },
+    { page: "finance" as Page, icon: CircleDollarSign, title: "Finance & approvals", copy: "Timesheets, invoices & claims" },
+    { page: "reports" as Page, icon: ArrowUpRight, title: "Reports & evidence", copy: "Operational exports & audit history" },
+  ].filter(item => allowed(item.page));
+
+  return <section className="page space-y-8">
+    <PageHeader category={today} title="Your day, at a glance." description={`Welcome back, ${session.data?.firstName ?? 'there'}. Here’s what needs your attention.`}>
+      <div className="flex items-center gap-3"><button onClick={() => refetch()} disabled={isFetching} aria-label="Refresh overview" className="grid size-11 place-items-center rounded-full border border-line bg-white hover:bg-canvas disabled:opacity-50"><RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`} /></button>{canCreateShift ? <button onClick={() => window.dispatchEvent(new CustomEvent("provider-navigate", { detail: { page: "roster", action: "create-shift" } }))} className="primary-button min-h-11"><CalendarDays size={16} /> Create shift</button> : allowed("roster") ? <button onClick={() => navigate("roster")} className="primary-button min-h-11">View roster <ArrowRight size={16} /></button> : null}</div>
+    </PageHeader>
+    {!isMockMode && metrics.length === 0 && <div role="status" className="flex items-start gap-3 rounded-xl border border-line bg-white p-5"><AlertCircle size={19} className="shrink-0 text-muted" /><div><h2 className="text-sm font-medium">Your operational overview is not connected yet</h2><p className="mt-2 text-sm leading-6 text-muted">Rosters, workforce readiness and claim summaries will appear here once their operational data is available. You can still use the workspaces below.</p></div></div>}
+    {metrics.length > 0 && <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{metrics.map(widget => { const { page, icon: Icon } = metricDefinitions[widget.id]; return <button key={widget.id} onClick={() => navigate(page)} className="group rounded-xl border border-line bg-white p-6 text-left transition-colors hover:border-brand-300"><div className="flex items-center justify-between text-muted"><span className="text-xs">{widget.title}</span><Icon size={17} strokeWidth={1.5} /></div><strong className="mb-4 mt-5 block text-[34px] font-normal leading-none tracking-[-.05em]">{widget.value}</strong><span className="flex items-center justify-between gap-2 text-xs leading-5 text-muted">{widget.detail}<ArrowUpRight className="size-4 shrink-0 text-ink" /></span></button>; })}</div>}
+    <div className={`grid gap-6 ${allowed("roster") ? "xl:grid-cols-[1.4fr_1fr]" : ""}`}>
+      {allowed("roster") && <article className="overflow-hidden rounded-xl border border-line bg-white"><header className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-6 py-5"><div><h2 className="text-base font-medium tracking-[-.02em]">Today’s roster</h2><p className="mt-1.5 text-xs text-muted">People and support, in one place.</p></div><button onClick={() => navigate("roster")} className="inline-flex min-h-11 items-center gap-2 text-xs text-brand-700">Open roster <ArrowUpRight size={15} /></button></header>{data.roster.length ? <ul className="divide-y divide-line">{data.roster.map(shift => <li key={shift.id}><button onClick={() => navigate("roster")} className="grid min-h-24 w-full grid-cols-[65px_1fr] items-center gap-3 px-6 py-4 text-left hover:bg-canvas sm:grid-cols-[65px_1fr_auto]"><time className="self-start pt-1 text-xs text-muted">{shift.time}</time><span><strong className="block text-sm font-medium">{shift.participant}</strong><span className="mt-2 block text-xs text-muted">{shift.worker}</span></span><span className={`col-start-2 inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] sm:col-start-auto ${shift.status === "Needs worker" ? "bg-amber-50 text-amber-800" : shift.status === "In progress" ? "bg-brand-50 text-brand-700" : "bg-canvas text-muted"}`}>{shift.status === "Needs worker" ? <AlertCircle size={12} /> : <Check size={12} />}{shift.status}</span></button></li>)}</ul> : <div className="grid min-h-64 place-content-center justify-items-center px-6 text-center"><CalendarDays className="mb-4 size-7 text-muted" strokeWidth={1.3} /><h3 className="text-sm font-medium">No roster entries to show</h3><p className="mt-2 max-w-64 text-xs leading-6 text-muted">Open the roster to review available shifts and plan upcoming support.</p></div>}</article>}
+      <article className="rounded-xl border border-line bg-white"><header className="border-b border-line px-6 py-5"><div className="flex items-center justify-between"><h2 className="text-base font-medium tracking-[-.02em]">Needs attention</h2><span className="grid size-6 place-items-center rounded-full bg-canvas text-xs text-muted">{attention.length}</span></div><p className="mt-1.5 text-xs text-muted">Review the detail before taking action.</p></header><div className="divide-y divide-line px-6">{attention.length ? attention.map(item => <button key={item.id} onClick={() => navigate(attentionPage(item.kind)!)} className="flex min-h-28 w-full items-start gap-3 py-6 text-left"><span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg bg-amber-50 text-amber-800"><AlertCircle size={16} /></span><span className="min-w-0 flex-1"><strong className="block text-sm font-medium leading-6">{item.title}</strong><span className="mt-1 block text-xs leading-6 text-muted">{item.detail}</span><span className="mt-2 inline-flex items-center gap-1 text-xs text-brand-700">Review details <ChevronRight size={13} /></span></span></button>) : <div className="py-12 text-center"><Check className="mx-auto mb-4 size-6 text-muted" /><p className="text-sm">No attention items to show</p><p className="mt-2 text-xs leading-6 text-muted">Items available to your role will appear here.</p></div>}</div></article>
+    </div>
+    {shortcuts.length > 0 && <section><div className="mb-4 flex items-center justify-between"><h2 className="text-base font-medium tracking-[-.02em]">Your workspace</h2><span className="text-xs text-muted">Pick up where you need to.</span></div><div className="grid gap-3 sm:grid-cols-2">{shortcuts.map(item => <button key={item.page} onClick={() => navigate(item.page)} className="flex min-h-24 items-center gap-4 rounded-xl border border-line bg-white px-5 py-4 text-left hover:border-brand-300"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-canvas"><item.icon size={19} strokeWidth={1.5} /></span><span className="min-w-0 flex-1"><strong className="block text-sm font-medium">{item.title}</strong><span className="mt-1.5 block text-xs leading-5 text-muted">{item.copy}</span></span><ArrowUpRight size={17} className="shrink-0 text-muted" /></button>)}</div></section>}
+    <p className="text-xs text-muted">{isMockMode ? "Sample overview · Fictional people and activity" : "Workspace overview"} · Last retrieved {new Intl.DateTimeFormat("en-AU", { hour: "numeric", minute: "2-digit" }).format(dataUpdatedAt)}</p>
+  </section>;
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@provider-ai/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b --pretty false",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@hookstate/core": "latest",
+    "@tanstack/react-query": "latest",
+    "lucide-react": "latest",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "18.3.28",
+    "@types/react-dom": "18.3.7",
+    "@vitejs/plugin-react": "latest",
+    "tailwindcss": "^4.3.3",
+    "typescript": "latest",
+    "vite": "latest",
+    "vitest": "latest"
+  }
+}
